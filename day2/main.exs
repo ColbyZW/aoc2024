@@ -48,10 +48,54 @@ defmodule DayTwo do
   end
 
   def partTwo() do
-
+    input("sample.txt")
+      |> Enum.map(fn line ->
+        line
+        |> Enum.reduce_while({0, 0, :ok}, fn (el, acc) ->
+          case acc do
+            {0, 0, :ok} ->
+              {:cont, {el, 0, :ok}}
+            {x, 0, :ok} ->
+              if x - el < 0 && abs(x - el) <= 3 do
+                {:cont, {el, 0, :inc}}
+              else
+                if x == el do
+                  {:halt, :bad}
+                else
+                  if abs(x - el) > 3 do
+                    {:cont, {el, 1, :dec}}
+                  else
+                    {:cont, {el, 0, :dec}}
+                  end
+                end
+              end
+            {x, y, :inc} ->
+              if x - el < 0 && abs(x - el) <= 3 do
+                {:cont, {el, 0, :inc}}
+              else
+                if y == 1 do
+                  {:halt, :bad}
+                else
+                  {:cont, {el, 1, :inc}}
+                end
+              end
+            {x, y, :dec} ->
+              if x - el > 0 && abs(x - el) <= 3 do
+                {:cont, {el, 0, :dec}}
+              else
+                if y == 1 do
+                  {:halt, :bad}
+                else
+                  {:cont, {el, 1, :dec}}
+                end
+              end
+          end
+        end)
+      end)
+      |> Enum.filter(fn (x) -> x != :bad end)
+      |> Enum.count
+      |> IO.puts
   end
-
-
 end
 
-DayTwo.partOne()
+DayTwo.partTwo()
